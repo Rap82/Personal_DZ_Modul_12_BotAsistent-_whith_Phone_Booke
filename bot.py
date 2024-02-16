@@ -1,4 +1,6 @@
 from classes import Record, AddressBook
+from colors import *
+from comands import *
 import json
 import os
 
@@ -6,16 +8,7 @@ class InputError(Exception):
     pass
 
 class ContactAssistant:
-    
-    YLLOW_TEXT = "\033[33m"
-    GREEN_TEXT = "\033[32m"
-    RED_TEXT = "\033[31m"
-    DEFALUT_TEXT = "\033[0m"
-    PURPURE_TEXT = "\033[35m"
-    BIRUZA_TEXT = "\033[36m"
-    LIST_COMANDS_BOT = ["hello", "add", "change","phone","show all",'search',"good bye", "close", "exit"]
-    DOSTUPNI_COMANDY = f"{RED_TEXT}Доступні наступні команди : {GREEN_TEXT}{LIST_COMANDS_BOT}{DEFALUT_TEXT}"
-    PISKAZKA_SHOW_ALL = f"\nКоманда - {GREEN_TEXT}show all{YLLOW_TEXT} - покаже доступні контакти{DEFALUT_TEXT}"
+   
     
     def __init__(self):
         self.address_book = AddressBook()
@@ -52,7 +45,7 @@ class ContactAssistant:
             record.add_phone(str(phone).strip()) 
             self.address_book.add_record(record)
             self.save_data()
-            return  f"{self.YLLOW_TEXT}Новий контакт успішно додано!!!{self.PISKAZKA_SHOW_ALL}"
+            return  f"{YLLOW}Новий контакт успішно додано!!!{PISKAZKA_SHOW_ALL}"
         except ValueError as e:
             raise InputError(str(e))
 
@@ -65,11 +58,11 @@ class ContactAssistant:
                     record.phones = []  
                     record.add_phone(phone)
                     self.save_data()  
-                    return f"{self.YLLOW_TEXT}Номер телефону успішно змінено!!!{self.PISKAZKA_SHOW_ALL}"
+                    return f"{YLLOW}Номер телефону успішно змінено!!!{PISKAZKA_SHOW_ALL}"
                 else:
-                    raise ValueError(f"{self.YLLOW_TEXT}Номер може містити тільки 10 цифри !!!{self.BIRUZA_TEXT}\n# Приклад - 0931245891")
+                    raise ValueError(f"{YLLOW}Номер може містити тільки 10 цифри !!!{BIRUZA}\n# Приклад - 0931245891")
             else:
-                raise IndexError(f"{self.YLLOW_TEXT}Такого іменні не знайдено у вашій телефоній книзі !!!{self.DEFALUT_TEXT}{self.PISKAZKA_SHOW_ALL} ")
+                raise IndexError(f"{YLLOW}Такого іменні не знайдено у вашій телефоній книзі !!!{DEFALUT}{PISKAZKA_SHOW_ALL} ")
         except (ValueError, IndexError) as e:
             raise InputError(str(e))
 
@@ -77,77 +70,60 @@ class ContactAssistant:
         try:
             record = self.address_book.find(name)
             if record:
-                return f"{self.YLLOW_TEXT}За вказаним іменем {self.BIRUZA_TEXT}{name}{self.YLLOW_TEXT} знайдено номер{self.BIRUZA_TEXT} {record.phones[0]}{self.DEFALUT_TEXT}"
+                return f"{YLLOW}За вказаним іменем {BIRUZA}{name}{YLLOW} знайдено номер{BIRUZA} {record.phones[0]}{DEFALUT}"
             else:
-                raise IndexError(f"{self.YLLOW_TEXT}Такого іменні не знайдено у вашій телефоній книзі !!!{self.DEFALUT_TEXT}{self.PISKAZKA_SHOW_ALL} ")
+                raise IndexError(f"{YLLOW}Такого іменні не знайдено у вашій телефоній книзі !!!{DEFALUT}{PISKAZKA_SHOW_ALL} ")
         except (ValueError, IndexError) as e:
             raise InputError(str(e))
 
     def show_all_contacts(self):
         records = list(self.address_book.values())
         if not records:
-            return f"{self.YLLOW_TEXT}Ваша телефона книга поки не містить жодного запису{self.DEFALUT_TEXT}"
+            return f"{YLLOW}Ваша телефона книга поки не містить жодного запису{DEFALUT}"
         else:
-            result = f'{self.GREEN_TEXT}{"Name":<10}  {"Phone":<12}{self.YLLOW_TEXT}\n'
+            result = f'{GREEN}{"Name":<10}  {"Phone":<12}{YLLOW}\n'
             for record in records:
                 phone_numbers = ', '.join(str(phone) for phone in record.phones)
-                result += f"{f"{record.name}":<10} {phone_numbers}\n" 
+                
+                result += f"{record.name}  {phone_numbers}\n" 
             return result.strip()
 
+    
 
 class CommandHandler:
-    YLLOW_TEXT = "\033[33m"
-    GREEN_TEXT = "\033[32m"
-    RED_TEXT = "\033[31m"
-    DEFALUT_TEXT = "\033[0m"
-    PURPURE_TEXT = "\033[35m"
-    BIRUZA_TEXT = "\033[36m"
-    LIST_COMANDS_BOT = ["hello", "add", "change","phone","show all",'search',"good bye", "close", "exit"]
-    DOSTUPNI_COMANDY = f"{RED_TEXT}Доступні наступні команди : {GREEN_TEXT}{LIST_COMANDS_BOT}{DEFALUT_TEXT}"
-    BAD_COMMAND_ADD = f"{YLLOW_TEXT}Невірні параметри для команди {GREEN_TEXT}add{YLLOW_TEXT} !!!.\n\
-                        {RED_TEXT}# Приклад {GREEN_TEXT}add{BIRUZA_TEXT} Імя_контакту{YLLOW_TEXT} Номер_телефону {DEFALUT_TEXT}"
-    
-    BAD_COMMAND_CHANGE = f"{YLLOW_TEXT}Невірні параметри для команди {GREEN_TEXT}change{YLLOW_TEXT} !!!.\n\
-                           {RED_TEXT}# Приклад {GREEN_TEXT}change{BIRUZA_TEXT} Імя_контакту{YLLOW_TEXT} "
-    
-    BAD_COMMAND_PHONE = f"{YLLOW_TEXT}Невірні параметри для команди {GREEN_TEXT}phone{YLLOW_TEXT} !!!.\n\
-                           {RED_TEXT}# Приклад {GREEN_TEXT}phone{BIRUZA_TEXT} Імя_контакту{YLLOW_TEXT} "
-    
-    BAD_COMMAND_SEARCH = f"{YLLOW_TEXT}Невірні параметри для команди {GREEN_TEXT}search{YLLOW_TEXT} !!!.\n\
-                           {RED_TEXT}# Приклад {GREEN_TEXT}search{BIRUZA_TEXT} Імя_контакту{YLLOW_TEXT} "
     
     
     def __init__(self, contact_assistant):
         self.contact_assistant = contact_assistant
 
     def handle_hello(self, args):
-        return f"{self.YLLOW_TEXT}How can I help you?{self.DEFALUT_TEXT}"
+        return f"{YLLOW}How can I help you?{DEFALUT}"
 
     def handle_add(self, args):
         if len(args) == 0:
-            raise InputError(self.BAD_COMMAND_ADD)
+            raise InputError(BAD_COMMAND_ADD)
 
         contact_info = args.split(" ")
         if len(contact_info) != 3:
-            raise InputError(self.BAD_COMMAND_ADD)
+            raise InputError(BAD_COMMAND_ADD)
 
         _, name, phone = args.split(" ")
         return self.contact_assistant.add_contact(name, phone)
 
     def handle_change(self, args):
         if len(args) == 0:
-            raise InputError(self.BAD_COMMAND_CHANGE)
+            raise InputError(BAD_COMMAND_CHANGE)
 
         contact_info = args.split(" ")
         if len(contact_info) != 3:
-            raise InputError(self.BAD_COMMAND_CHANGE)
+            raise InputError(BAD_COMMAND_CHANGE)
 
         _, name, phone = args.split(" ")
         return self.contact_assistant.change_contact(name, phone)
 
     def handle_phone(self, args):
         if len(args) == 0:
-            raise InputError(self.BAD_COMMAND_PHONE)
+            raise InputError(BAD_COMMAND_PHONE)
         args_list = args.split(" ")
         name = args_list[1]
         return self.contact_assistant.get_phone(name)
@@ -161,15 +137,15 @@ class CommandHandler:
     
     def handle_search(self, args):
         if len(args) == 0:
-            raise InputError(self.BAD_COMMAND_SEARCH)
+            raise InputError(BAD_COMMAND_SEARCH)
 
         query = args.split(" ", 1)[1]
         matching_records = self.contact_assistant.address_book.search(query)
 
         if not matching_records:
-            return f"{self.YLLOW_TEXT}Нажаль нічого не знайдено  {self.DEFALUT_TEXT}"
+            return f"{YLLOW}Нажаль нічого не знайдено  {DEFALUT}"
         else:
-            result = f"{self.YLLOW_TEXT}За Вашим запитом = {self.RED_TEXT}{query}{self.YLLOW_TEXT} було знайдено наступні записи :{self.DEFALUT_TEXT}\n"
+            result = f"{YLLOW}За Вашим запитом = {RED}{query}{YLLOW} було знайдено наступні записи :{DEFALUT}\n"
             for record in matching_records:
                 phone_numbers = ', '.join(str(phone) for phone in record.phones)
                 result += f"{record.name}: {phone_numbers}\n"
@@ -187,12 +163,12 @@ class CommandHandler:
             "exit": self.handle_bye,
             "good bye": self.handle_bye,
         }
-        return actions.get(data, lambda args: f'{self.YLLOW_TEXT}Tака команда не пітримується наразі\n{self.DEFALUT_TEXT}{self.DOSTUPNI_COMANDY}')
+        return actions.get(data, lambda args: f'{YLLOW}Tака команда не пітримується наразі\n{DEFALUT}{DOSTUPNI_COMANDY}')
 
     def process_input(self, user_input):
         try:
             if not user_input:
-                raise InputError(f'{self.YLLOW_TEXT}Ви нічого не ввели \n{self.DOSTUPNI_COMANDY}')
+                raise InputError(f'{YLLOW}Ви нічого не ввели \n{DOSTUPNI_COMANDY}')
 
             space_index = user_input.find(' ')
 
@@ -215,15 +191,10 @@ class CommandHandler:
             return str(e)
 
 class Bot:
-    YLLOW_TEXT = "\033[33m"
-    GREEN_TEXT = "\033[32m"
-    RED_TEXT = "\033[31m"
-    DEFALUT_TEXT = "\033[0m"
-    PURPURE_TEXT = "\033[35m"
-    BIRUZA_TEXT = "\033[36m"
-    LIST_COMANDS_BOT = ["hello", "add", "change","phone","show all",'search',"good bye", "close", "exit"]
-    print(f'\n{YLLOW_TEXT}Вас вітає Бот для роботи з вашии контактами.')
-    print(f'{RED_TEXT}Доступні наступні команди : {GREEN_TEXT}{LIST_COMANDS_BOT}{DEFALUT_TEXT}')
+    
+    
+    print(f'\n{YLLOW}Вас вітає Бот для роботи з вашии контактами.')
+    print(f'{RED}Доступні наступні команди : {GREEN}{LIST_COMANDS_BOT}{DEFALUT}')
     
     def run(self):
         contact_assistant = ContactAssistant()
@@ -231,7 +202,7 @@ class Bot:
 
         while True:
             try:
-                user_input = input(f"{self.PURPURE_TEXT}ВВедіть команду>>{self.DEFALUT_TEXT}").lower().strip()
+                user_input = input(f"{PURPURE}ВВедіть команду>>{DEFALUT}").lower().strip()
                 result = command_handler.process_input(user_input)
 
                 if result is None:
