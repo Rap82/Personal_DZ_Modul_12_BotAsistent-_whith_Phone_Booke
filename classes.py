@@ -1,12 +1,15 @@
 from datetime import datetime
 from collections import UserDict
+from colors import *
+from comands import *
+
 
 class Field:
     def __init__(self, value):
         if not self.is_valid(value):
-            if f"{self.__class__.__name__.lower()}" == "phone" :
+            if f"{self.__class__.__name__.lower()}" == "phone":
         
-                raise ValueError(f"Номер може містити тільки 10 цифри !!!\n# Приклад - 0931245891")
+                raise ValueError(BAD_FORMAT_PHONE)
         self.__value = value
 
     @property
@@ -16,9 +19,9 @@ class Field:
     @value.setter
     def value(self, new_value):
         if not self.is_valid(new_value):
-            if f"{self.__class__.__name__.lower()}" == "phone" :
+            if f"{self.__class__.__name__.lower()}" == "phone":
         
-                raise ValueError(f"Номер може містити тільки 10 цифри !!!\n# Приклад - 0931245891")
+                raise ValueError(BAD_FORMAT_PHONE)
         self.__value = new_value
 
     def __str__(self):
@@ -32,15 +35,18 @@ class Field:
 
 
 class Name(Field):
+    # def __format__(self, format_spec):
+    #     return '{:<10}'.format(self.value)
     pass
 
 
 class Phone(Field):
     def is_valid(self, value):
-        if  (len(value) == 10 and value.isdigit()):
+        if len(value) == 10 and value.isdigit():
             return value
-        else :
-            raise ValueError(f"Invalid phone number format phone for '{value}'")
+        else:
+            raise ValueError(f"\n {YLLOW}-- <'{RED}{value}{YLLOW}'> -- {BAD_FORMAT_PHONE}")
+
 
 class Birthday(Field):
     def is_valid(self, value):        
@@ -65,16 +71,16 @@ class Record:
         initial_len = len(self.phones)
         self.phones = [p for p in self.phones if p.value != phone]
         if len(self.phones) == initial_len:
-            raise ValueError(f"Phone number '{phone}' not found")
+            raise ValueError(f"{YLLOW}Такого номера телефона <--'{RED}{phone}{YLLOW}-->' немає нажаль у вашій телефоній книжці")
 
     def edit_phone(self, old_phone, new_phone):
         if not Phone(new_phone).is_valid(new_phone):
-            raise ValueError(f"Invalid phone number format for '{new_phone}'")
+            raise ValueError (f"\n {YLLOW}-- <'{RED}{new_phone}{YLLOW}'> -- {BAD_FORMAT_PHONE}")
         for p in self.phones:
             if p.value == old_phone:
                 p.value = new_phone
                 return
-        raise ValueError(f"Phone number '{old_phone}' not found")
+        raise ValueError(f"{YLLOW}Такого номера телефона <--'{RED}{old_phone}{YLLOW}-->' немає нажаль у вашій телефоній книжці")
 
     def find_phone(self, phone):
         found_numbers = [p for p in self.phones if p.value == phone]
@@ -101,6 +107,7 @@ class Record:
             "birthday": self.birthday.__json__() if self.birthday else None
         }
         return record_data
+
 
 class AddressBook(UserDict):
     def search(self, query):
